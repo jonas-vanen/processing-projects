@@ -36,7 +36,7 @@ function Snake(x, y) {
     direction.set(dirx, diry);
 
     // Randomize the snakes direction.
-    //const dirx = moveX ? (random(1) < 0.5 ? 1*a : -1*a) : 0;
+    //const dirx = moveX ? (random(1) < 0.5 ? 1 : -1) : 0;
     //const diry = moveX ? 0 : (random(1) < 0.5 ? 1 : -1);
   };
 
