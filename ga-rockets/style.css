@@ -1,0 +1,13 @@
+pre.fps {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 14px;
+
+  -webkit-user-select: none;     
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
