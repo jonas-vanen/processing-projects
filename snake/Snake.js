@@ -1,0 +1,145 @@
+function Snake(x, y) {
+  this.tail = [];
+
+  const origin = createVector(x || 0, y || 0)
+  const position = origin.copy();
+  const previous = position.copy();
+  const direction = createVector();
+
+  let lost = false;
+  let onLose = undefined;
+  let scale = 10;
+
+  // Set the position of the snake.
+  this.setPos = (x, y) => position.set(x, y);
+  // Set the direction of the snake.
+  this.setDir = (x, y) => direction.set(x, y);
+  // Set the scale of the game.
+  this.setScale = function (scl) {
+    scale = scl;
+    return scale;
+  };
+  this.randomize = function () {
+    // Randomize the snake's position.
+    const col = floor(random(floor(width / scale)));
+    const row = floor(random(floor(height / scale)));
+    position.set(col * scale + origin.x, row * scale + origin.y);
+    previous.set(position.x, position.y);
+
+    // Choose randomly if the snake moves on the x- or y-axis
+    // and choose the direction according to where it is.
+    // E.g. if it is in the left half of the window and it is
+    // going to move on the x-axis it will move to the right.
+    const moveX = random(1) < 0.5;
+    const dirx = moveX ? (col < scale / 2 ? 1 : -1) : 0;
+    const diry = moveX ? 0 : (row < scale / 2 ? 1 : -1);
+    direction.set(dirx, diry);
+
+    // Randomize the snakes direction.
+    //const dirx = moveX ? (random(1) < 0.5 ? 1*a : -1*a) : 0;
+    //const diry = moveX ? 0 : (random(1) < 0.5 ? 1 : -1);
+  };
+
+  // Check if the player has lost the game
+  this.hasLost = () => lost;
+  // Set an event listener for the case the the play loses the game.
+  this.onLose = (func) => onLose = func;
+  // Lose the game.
+  this.lose = () => {
+    lost = true;
+    // Invoke the onLose event listener function.
+    if (typeof onLose === 'function')
+      onLose();
+  };
+
+  // Restart the game.
+  this.restart = function () {
+    lost = false;
+    this.randomize();
+    this.tail = [];
+  };
+
+  // Make the snake's tail one node longer.
+  this.extend = function () {
+    const node = createVector(position.x, position.y);
+    this.tail.push(node);
+  };
+
+  // Eat a food item.
+  this.eat = function (food) {
+    // Check if the food vector is inside the the snake.
+    return food.x >= position.x && food.x < position.x + scale &&
+      food.y >= position.y && food.y < position.y + scale;
+  };
+
+  // Update the position of the snake and its tail.
+  this.update = function () {
+    // Future x and y locations.
+    const nx = position.x + direction.x * scale;
+    const ny = position.y + direction.y * scale;
+
+    // The player loses if the snake is outside the window
+    if (nx < origin.x || nx > width - scale ||
+        ny < origin.y || ny > height - scale) {
+      this.lose();
+      return;
+    }
+
+    // If the user drives into the first tail node, lose.
+    if (this.tail.length > 0 && previous.x === nx && previous.y === ny) {
+      this.lose();
+      return;
+    }
+
+    // Update the previous position.
+    previous.set(position.x, position.y);
+
+    // Update the position of the snake.
+    position.x = nx;
+    position.y = ny;
+
+    if (this.tail.length < 1)
+      return;
+
+    // Update the positions of the first tail node to
+    // the previous position of the snake.
+    let prev = this.tail[0].copy();
+    this.tail[0] = previous.copy();
+
+    for (let i = 1; i < this.tail.length; ++i) {
+      // If the user drives into a tail's node, lose.
+      if (prev.equals(position)) {
+        this.lose();
+        return;
+      }
+
+      // Update the positions of the tail nodes to
+      // the positions of the node that was added earlier.
+      const temp = this.tail[i].copy();
+      this.tail[i] = prev;
+      prev = temp;
+    }
+  };
+
+  this.display = function () {
+    // Change color mode to HSB.
+    colorMode(HSB, 100);
+    // First rectange will be red.
+    fill(16, 100, 100);
+    stroke(100, 100, 100);
+    rect(position.x, position.y, scale, scale);
+
+    // Display each tail node.
+    for (let i = 0; i < this.tail.length; ++i) {
+      // Calculate the hue based on the tail number
+      const hue = (i + 17) % 101;
+      fill(hue, 100, 100);
+      // Invert the stroke.
+      stroke(100 - hue, 100, 100);
+
+      rect(this.tail[i].x, this.tail[i].y, scale, scale);
+    }
+
+    colorMode(RGB);
+  };
+}
