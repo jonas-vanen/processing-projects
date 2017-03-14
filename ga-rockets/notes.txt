@@ -1,0 +1,16 @@
+function parseRGB(rgb) {
+  let index = 0;
+  for (; index < rgb.length && rgb[index] === '#'; ++index) ;
+  const hex = parseInt(rgb.substr(index), 16);
+  return {
+    r: (hex >> 16) & 0x0000ff,
+    g: (hex >> 8) & 0x0000ff,
+    b: hex & 0x0000ff
+  };
+}
+
+----------
+
+p5 - Genetic Algorithm (Rockets):
+Increase mutation rate if a set of DNAs does not
+perform well for a certain amount of time.

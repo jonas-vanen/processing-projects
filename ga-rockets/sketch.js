@@ -2,8 +2,10 @@ let population;
 let origin, targetObstacle;
 let obstacles = [];
 
-const size = 160;
+const size = 100;
 const lifetime = 500;
+let fitnesses = '';
+let averageFitnesses = '';
 
 function setup() {
   createCanvas(1000, 640);
@@ -17,6 +19,20 @@ function setup() {
   obstacles.push(new Obstacle(width / 2, height * 9/16, 400, 8));
   obstacles.push(new Obstacle(width * 1/4, height / 3, 300, 8));
   obstacles.push(new Obstacle(width * 3/4, height / 3, 300, 8));
+
+  /*origin = createVector(16, height / 2);
+  targetObstacle = new Obstacle(width - 32, height / 2, 24, 24);
+
+  // First row
+  obstacles.push(new Obstacle(width * 0.2, height * 0.2, 8, height * 0.4));
+  obstacles.push(new Obstacle(width * 0.2, height - height * 0.1 - 1, 8, height - height * 0.8));
+  // Second row
+  obstacles.push(new Obstacle(width * 0.39, height * 0.5, 8, height * 0.5));
+  // Third row
+  obstacles.push(new Obstacle(width * 0.6, height * 0.2, 8, height * 0.4));
+  obstacles.push(new Obstacle(width * 0.56, height - height * 0.05 - 1, 8, height - height * 0.9));
+  // Thick obstacle
+  obstacles.push(new Obstacle(width * 0.8, height * 0.5, 40, 260));*/
 
   population = new Population(origin, targetObstacle, size, lifetime);
   population.generate();
@@ -33,6 +49,9 @@ function draw() {
   if (!population.cycle()) {
     population.populate();
     console.log(population.fittest);
+    fitnesses += (population.fittest ? population.fittest.fitness : 0.0) + '\r\n';
+    averageFitnesses += population.averageFitness + '\r\n';
+    //console.log(fitnesses);
   }
 
   // Draw the obstacles and kill DNA that hits one.

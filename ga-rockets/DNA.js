@@ -44,11 +44,18 @@ function DNA(location, lifetime, genes) {
 
   this.crossover = function (parent) {
     const newGenes = [];
+    for (let i = 0; i < self.genes.length && i < parent.genes.length; ++i) {
+      const ownGene = random(1) < 0.5;
+      newGenes[i] = ownGene ? self.genes[i] : parent.genes[i];
+    }
+    return new DNA(null, self.lifetime, newGenes);
+
+    /*const newGenes = [];
     // Split the string at a random index.
     const middle = floor(random(self.genes.length));
     for (let i = 0; i < self.genes.length && i < parent.genes.length; ++i)
       newGenes.push(i > middle ? self.genes[i] : parent.genes[i]);
-    return new DNA(null, self.lifetime, newGenes);
+    return new DNA(null, self.lifetime, newGenes);*/
   };
 
   this.mutate = function (mutationRate) {

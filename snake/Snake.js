@@ -1,9 +1,9 @@
 function Snake(x, y) {
   this.tail = [];
+  this.position = createVector(x || 0, y || 0);
 
-  const origin = createVector(x || 0, y || 0)
-  const position = origin.copy();
-  const previous = position.copy();
+  const origin = this.position.copy();
+  const previous = this.position.copy();
   const direction = createVector();
 
   let lost = false;
@@ -11,7 +11,7 @@ function Snake(x, y) {
   let scale = 10;
 
   // Set the position of the snake.
-  this.setPos = (x, y) => position.set(x, y);
+  this.setPos = (x, y) => this.position.set(x, y);
   // Set the direction of the snake.
   this.setDir = (x, y) => direction.set(x, y);
   // Set the scale of the game.
@@ -23,8 +23,8 @@ function Snake(x, y) {
     // Randomize the snake's position.
     const col = floor(random(floor(width / scale)));
     const row = floor(random(floor(height / scale)));
-    position.set(col * scale + origin.x, row * scale + origin.y);
-    previous.set(position.x, position.y);
+    this.position.set(col * scale + origin.x, row * scale + origin.y);
+    previous.set(this.position.x, this.position.y);
 
     // Choose randomly if the snake moves on the x- or y-axis
     // and choose the direction according to where it is.
@@ -61,26 +61,31 @@ function Snake(x, y) {
 
   // Make the snake's tail one node longer.
   this.extend = function () {
-    const node = createVector(position.x, position.y);
+    const node = this.position.copy();
     this.tail.push(node);
   };
 
-  // Eat a food item.
-  this.eat = function (food) {
+  // Check if the snake can eat a food item.
+  this.eat = function (food, y) {
+    // Pretend that an x and a y value were passed
+    // if the argument list's length is larger than 1.
+    if (arguments.length > 1)
+      food = {x: food, y: y};
+
     // Check if the food vector is inside the the snake.
-    return food.x >= position.x && food.x < position.x + scale &&
-      food.y >= position.y && food.y < position.y + scale;
+    return food.x >= this.position.x && food.x < this.position.x + scale &&
+      food.y >= this.position.y && food.y < this.position.y + scale;
   };
 
   // Update the position of the snake and its tail.
   this.update = function () {
     // Future x and y locations.
-    const nx = position.x + direction.x * scale;
-    const ny = position.y + direction.y * scale;
+    const nx = this.position.x + direction.x * scale;
+    const ny = this.position.y + direction.y * scale;
 
     // The player loses if the snake is outside the window
-    if (nx < origin.x || nx > width - scale ||
-        ny < origin.y || ny > height - scale) {
+    if (nx < origin.x || nx > width - origin.x - scale ||
+        ny < origin.y || ny > height - origin.y - scale) {
       this.lose();
       return;
     }
@@ -92,11 +97,10 @@ function Snake(x, y) {
     }
 
     // Update the previous position.
-    previous.set(position.x, position.y);
+    previous.set(this.position.x, this.position.y);
 
     // Update the position of the snake.
-    position.x = nx;
-    position.y = ny;
+    this.position.set(nx, ny);
 
     if (this.tail.length < 1)
       return;
@@ -108,7 +112,7 @@ function Snake(x, y) {
 
     for (let i = 1; i < this.tail.length; ++i) {
       // If the user drives into a tail's node, lose.
-      if (prev.equals(position)) {
+      if (prev.equals(this.position)) {
         this.lose();
         return;
       }
@@ -121,13 +125,29 @@ function Snake(x, y) {
     }
   };
 
+  this.collide = function (snake) {
+    // If the snake is inside the other snake's head, lose.
+    if (this.position.equals(snake.position)) {
+      this.lose();
+      return;
+    }
+
+    // Check each tail node of the other snake.
+    for (let i = 0; i < snake.tail.length; ++i) {
+      // If the snake is inside this tail node, lose.
+      if (this.position.equals(snake.tail[i].pos)) {
+        this.lose();
+        return;
+      }
+    }
+  };
+
   this.display = function () {
     // Change color mode to HSB.
     colorMode(HSB, 100);
-    // First rectange will be red.
     fill(16, 100, 100);
     stroke(100, 100, 100);
-    rect(position.x, position.y, scale, scale);
+    rect(this.position.x, this.position.y, scale, scale);
 
     // Display each tail node.
     for (let i = 0; i < this.tail.length; ++i) {
@@ -140,6 +160,7 @@ function Snake(x, y) {
       rect(this.tail[i].x, this.tail[i].y, scale, scale);
     }
 
+    // Reset color mode.
     colorMode(RGB);
   };
 }
