@@ -14,6 +14,8 @@ function Snake(x, y) {
   this.setPos = (x, y) => this.position.set(x, y);
   // Set the direction of the snake.
   this.setDir = (x, y) => direction.set(x, y);
+  // Get the direction of the snake.
+  this.getDir = () => direction;
   // Set the scale of the game.
   this.setScale = function (scl) {
     scale = scl;

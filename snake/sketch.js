@@ -138,13 +138,16 @@ function keyPressed() {
     if (i >= controls.length)
       break;
 
+	const dir = snakes[i].getDir();
+	const len = snakes[i].tail.length;
+  
     // Update the snakes location when the
     // player presses one of the arrow keys.
     switch (keyCode) {
-      case controls[i].up: snakes[i].setDir(0, -1); break;
-      case controls[i].right: snakes[i].setDir(1, 0); break;
-      case controls[i].down: snakes[i].setDir(0, 1); break;
-      case controls[i].left: snakes[i].setDir(-1, 0); break;
+      case controls[i].up:    if (dir.y < 1 || len < 1)  snakes[i].setDir(0, -1); break;
+      case controls[i].right: if (dir.x > -1 || len < 1) snakes[i].setDir(1, 0);  break;
+      case controls[i].down:  if (dir.y > -1 || len < 1) snakes[i].setDir(0, 1);  break;
+      case controls[i].left:  if (dir.x < 1 || len < 1)  snakes[i].setDir(-1, 0); break;
     }
   }
 }
